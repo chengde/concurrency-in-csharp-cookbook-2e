@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Nito.AsyncEx;
 //using Nito.AsyncEx;
 
 public class ch02r01
@@ -156,7 +157,7 @@ public class ch02r03
     }
 }
 
-class ch02r04
+public class ch02r04
 {
     async Task Test()
     {
@@ -206,7 +207,7 @@ class ch02r04
         throw new InvalidOperationException();
     }
 
-    async Task ObserveOneExceptionAsync()
+    public async Task ObserveOneExceptionAsync()
     {
         var task1 = ThrowNotImplementedExceptionAsync();
         var task2 = ThrowInvalidOperationExceptionAsync();
@@ -219,10 +220,11 @@ class ch02r04
         {
             // "ex" is either NotImplementedException or InvalidOperationException.
             // ...
+            Console.WriteLine(ex.ToString());
         }
     }
 
-    async Task ObserveAllExceptionsAsync()
+    public async Task ObserveAllExceptionsAsync()
     {
         var task1 = ThrowNotImplementedExceptionAsync();
         var task2 = ThrowInvalidOperationExceptionAsync();
@@ -235,6 +237,7 @@ class ch02r04
         catch
         {
             AggregateException allExceptions = allTasks.Exception;
+            Console.WriteLine(allExceptions.ToString());
             // ...
         }
     }
@@ -260,7 +263,7 @@ class ch02r05
     }
 }
 
-class ch02r06A
+public class ch02r06A
 {
     async Task<int> DelayAndReturnAsync(int value)
     {
@@ -270,7 +273,7 @@ class ch02r06A
 
     // Currently, this method prints "2", "3", and "1".
     // The desired behavior is for this method to print "1", "2", and "3".
-    async Task ProcessTasksAsync()
+    public async Task ProcessTasksAsync()
     {
         // Create a sequence of tasks.
         Task<int> taskA = DelayAndReturnAsync(2);
@@ -287,7 +290,7 @@ class ch02r06A
     }
 }
 
-class ch02r06B
+public class ch02r06B
 {
     async Task<int> DelayAndReturnAsync(int value)
     {
@@ -302,7 +305,7 @@ class ch02r06B
     }
 
     // This method now prints "1", "2", and "3".
-    async Task ProcessTasksAsync()
+    public async Task ProcessTasksAsync()
     {
         // Create a sequence of tasks.
         Task<int> taskA = DelayAndReturnAsync(2);
@@ -319,7 +322,7 @@ class ch02r06B
     }
 }
 
-class ch02r06C
+public class ch02r06C
 {
     async Task<int> DelayAndReturnAsync(int value)
     {
@@ -328,7 +331,7 @@ class ch02r06C
     }
 
     // This method now prints "1", "2", and "3".
-    async Task ProcessTasksAsync()
+    public async Task ProcessTasksAsync()
     {
         // Create a sequence of tasks.
         Task<int> taskA = DelayAndReturnAsync(2);
@@ -347,31 +350,31 @@ class ch02r06C
     }
 }
 
-//class ch02r06D
-//{
-//  async Task<int> DelayAndReturnAsync(int value)
-//  {
-//    await Task.Delay(TimeSpan.FromSeconds(value));
-//    return value;
-//  }
+class ch02r06D
+{
+    async Task<int> DelayAndReturnAsync(int value)
+    {
+        await Task.Delay(TimeSpan.FromSeconds(value));
+        return value;
+    }
 
-//  // This method now prints "1", "2", and "3".
-//  async Task UseOrderByCompletionAsync()
-//  {
-//    // Create a sequence of tasks.
-//    Task<int> taskA = DelayAndReturnAsync(2);
-//    Task<int> taskB = DelayAndReturnAsync(3);
-//    Task<int> taskC = DelayAndReturnAsync(1);
-//    Task<int>[] tasks = new[] { taskA, taskB, taskC };
+    // This method now prints "1", "2", and "3".
+    async Task UseOrderByCompletionAsync()
+    {
+        // Create a sequence of tasks.
+        Task<int> taskA = DelayAndReturnAsync(2);
+        Task<int> taskB = DelayAndReturnAsync(3);
+        Task<int> taskC = DelayAndReturnAsync(1);
+        Task<int>[] tasks = new[] { taskA, taskB, taskC };
 
-//    // Await each one as they complete.
-//    foreach (Task<int> task in tasks.OrderByCompletion())
-//    {
-//      int result = await task;
-//      Trace.WriteLine(result);
-//    }
-//  }
-//}
+        // Await each one as they complete.
+        foreach (Task<int> task in tasks.OrderByCompletion())// OrderByCompletion
+        {
+            int result = await task;
+            Trace.WriteLine(result);
+        }
+    }
+}
 
 class ch02r07
 {
@@ -492,81 +495,81 @@ class ch02r09A
 //  }
 //}
 
-//abstract class ch02r10B
-//{
-//  bool CanBehaveSynchronously;
+abstract class ch02r10B
+{
+    bool CanBehaveSynchronously;
 
-//  public ValueTask<int> MethodAsync()
-//  {
-//    if (CanBehaveSynchronously)
-//      return new ValueTask<int>(13);
-//    return new ValueTask<int>(SlowMethodAsync());
-//  }
+    public ValueTask<int> MethodAsync()
+    {
+        if (CanBehaveSynchronously)
+            return new ValueTask<int>(13);
+        return new ValueTask<int>(SlowMethodAsync());
+    }
 
-//  private Task<int> SlowMethodAsync() => Task.FromResult(13);
-//}
+    private Task<int> SlowMethodAsync() => Task.FromResult(13);
+}
 
-//class ch02r10C
-//{
-//  private Func<Task> _disposeLogic;
+class ch02r10C
+{
+    private Func<Task> _disposeLogic;
 
-//  public ValueTask DisposeAsync()
-//  {
-//    if (_disposeLogic == null)
-//      return default;
+    public ValueTask DisposeAsync()
+    {
+        if (_disposeLogic == null)
+            return default;
 
-//    // Note: this simple example is not threadsafe;
-//    //  if multiple threads call DisposeAsync,
-//    //  the logic could run more than once.
-//    Func<Task> logic = _disposeLogic;
-//    _disposeLogic = null;
-//    return new ValueTask(logic());
-//  }
-//}
+        // Note: this simple example is not threadsafe;
+        //  if multiple threads call DisposeAsync,
+        //  the logic could run more than once.
+        Func<Task> logic = _disposeLogic;
+        _disposeLogic = null;
+        return new ValueTask(logic());
+    }
+}
 
-//class ch02r11A
-//{
-//  ValueTask<int> MethodAsync() => new ValueTask<int>(13);
+class ch02r11A
+{
+    ValueTask<int> MethodAsync() => new ValueTask<int>(13);
 
-//  async Task ConsumingMethodAsync()
-//  {
-//    int value = await MethodAsync();
-//  }
-//}
+    async Task ConsumingMethodAsync()
+    {
+        int value = await MethodAsync();
+    }
+}
 
-//class ch02r11B
-//{
-//  ValueTask<int> MethodAsync() => new ValueTask<int>(13);
+class ch02r11B
+{
+    ValueTask<int> MethodAsync() => new ValueTask<int>(13);
 
-//  async Task ConsumingMethodAsync()
-//  {
-//    ValueTask<int> valueTask = MethodAsync();
-//    // ... // other concurrent work
-//    int value = await valueTask;
-//  }
-//}
+    async Task ConsumingMethodAsync()
+    {
+        ValueTask<int> valueTask = MethodAsync();
+        // ... // other concurrent work
+        int value = await valueTask;
+    }
+}
 
-//class ch02r11C
-//{
-//  ValueTask<int> MethodAsync() => new ValueTask<int>(13);
+class ch02r11C
+{
+    ValueTask<int> MethodAsync() => new ValueTask<int>(13);
 
-//  async Task ConsumingMethodAsync()
-//  {
-//    Task<int> task = MethodAsync().AsTask();
-//    // ... // other concurrent work
-//    int value = await task;
-//    int anotherValue = await task;
-//  }
-//}
+    async Task ConsumingMethodAsync()
+    {
+        Task<int> task = MethodAsync().AsTask();
+        // ... // other concurrent work
+        int value = await task;
+        int anotherValue = await task;
+    }
+}
 
-//class ch02r11D
-//{
-//  ValueTask<int> MethodAsync() => new ValueTask<int>(13);
+class ch02r11D
+{
+    ValueTask<int> MethodAsync() => new ValueTask<int>(13);
 
-//  async Task ConsumingMethodAsync()
-//  {
-//    Task<int> task1 = MethodAsync().AsTask();
-//    Task<int> task2 = MethodAsync().AsTask();
-//    int[] results = await Task.WhenAll(task1, task2);
-//  }
-//}
+    async Task ConsumingMethodAsync()
+    {
+        Task<int> task1 = MethodAsync().AsTask();
+        Task<int> task2 = MethodAsync().AsTask();
+        int[] results = await Task.WhenAll(task1, task2);
+    }
+}

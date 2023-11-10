@@ -7,9 +7,9 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-class ch03r01
+public class ch03r01
 {
-    async IAsyncEnumerable<int> GetValuesAsync()
+    public async IAsyncEnumerable<int> GetValuesAsync()
     {
         await Task.Delay(1000); // some asynchronous work
         yield return 10;
@@ -17,7 +17,7 @@ class ch03r01
         yield return 13;
     }
 
-    async IAsyncEnumerable<string> GetValuesAsync(HttpClient client)
+    public async IAsyncEnumerable<string> GetValuesAsync(HttpClient client)
     {
         int offset = 0;
         const int limit = 10;
@@ -115,9 +115,9 @@ public class ch03r02_JBOY
 }
 
 
-class ch03r03
+public class ch03r03
 {
-    async Task Test()
+    public async Task Test()
     {
         IAsyncEnumerable<int> values = SlowRange().WhereAwait(
             async value =>
@@ -144,7 +144,7 @@ class ch03r03
         }
     }
 
-    async Task Test2()
+    public async Task Test2()
     {
         // Produce sequence that slows down as it progresses
         async IAsyncEnumerable<int> SlowRange()
@@ -164,7 +164,7 @@ class ch03r03
         }
     }
 
-    async Task Test3()
+    public async Task Test3()
     {
         // Produce sequence that slows down as it progresses
         async IAsyncEnumerable<int> SlowRange()
@@ -178,9 +178,10 @@ class ch03r03
 
 
         int count = await SlowRange().CountAsync(value => value % 2 == 0);
+        Console.WriteLine(count);
     }
 
-    async Task Test4()
+    public async Task Test4()
     {
         // Produce sequence that slows down as it progresses
         async IAsyncEnumerable<int> SlowRange()
@@ -199,13 +200,14 @@ class ch03r03
                 await Task.Delay(10);
                 return value % 2 == 0;
             });
+        Console.WriteLine(count);
     }
 }
 
 
-class ch03r04
+public class ch03r04
 {
-    async Task Test()
+    public async Task Test()
     {
         await foreach (int result in SlowRange())
         {
@@ -226,15 +228,15 @@ class ch03r04
     }
 }
 
-class ch03r04B
+public class ch03r04B
 {
-    async Task Test2()
+    public async Task Test()
     {
         using var cts = new CancellationTokenSource(500);
         CancellationToken token = cts.Token;
         await foreach (int result in SlowRange(token))
         {
-            Console.WriteLine(result);
+            //Console.WriteLine($"ok {result}" );
         }
     }
 
@@ -250,9 +252,9 @@ class ch03r04B
     }
 }
 
-class ch03r04C
+public class ch03r04C
 {
-    async Task ConsumeSequence(IAsyncEnumerable<int> items)
+    public async Task ConsumeSequence(IAsyncEnumerable<int> items)
     {
         using var cts = new CancellationTokenSource(500);
         CancellationToken token = cts.Token;
@@ -273,13 +275,13 @@ class ch03r04C
         }
     }
 
-    async Task Test() =>
+    public async Task Test() =>
     await ConsumeSequence(SlowRange());
 }
 
-class ch03r04D
+public class ch03r04D
 {
-    async Task ConsumeSequence(IAsyncEnumerable<int> items)
+    public async Task ConsumeSequence(IAsyncEnumerable<int> items)
     {
         using var cts = new CancellationTokenSource(500);
         CancellationToken token = cts.Token;

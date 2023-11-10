@@ -1,13 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <LangVersion>8.0</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
     <Compile Remove="ch01.cs" />
-    <Compile Remove="ch05.cs" />
     <Compile Remove="ch06.cs" />
     <Compile Remove="ch07.cs" />
     <Compile Remove="ch08.cs" />
